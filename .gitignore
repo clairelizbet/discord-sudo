@@ -1,0 +1,11 @@
+# Used to provide environment variables for local development
+.env
+
+# Database of active sudo authorizations and command sync data
+sudo.db
+
+# Third-party dependencies
+node_modules/
+
+# Builds are stored here
+dist/
