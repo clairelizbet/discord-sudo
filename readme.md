@@ -1,6 +1,6 @@
 # Sudo for Discord
 
-Control access to admin prvileges on your server with Sudo for Discord
+Control access to admin privileges on your server with Sudo for Discord
 
 ## Setup
 
