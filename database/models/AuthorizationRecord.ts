@@ -1,4 +1,10 @@
-import { addMinutes, formatISO, isPast, parseISO } from 'date-fns'
+import {
+  addMinutes,
+  differenceInMilliseconds,
+  formatISO,
+  isPast,
+  parseISO,
+} from 'date-fns'
 import { Snowflake } from 'discord.js'
 
 interface AuthorizationRecordData {
@@ -46,6 +52,10 @@ class AuthorizationRecord implements AuthorizationRecordData {
 
   isExpired(): boolean {
     return isPast(this.expiration)
+  }
+
+  millisecondsUntilExpiration(): number {
+    return differenceInMilliseconds(this.expiration, Date.now())
   }
 }
 

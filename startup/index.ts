@@ -8,21 +8,59 @@ import {
   getDiscordClient,
 } from '../discord'
 import { connectDatabase } from '../database'
+import { DiscordAPIError } from 'discord.js'
 
 async function initialize(): Promise<void> {
   const discordClient = await connectDiscord()
   const db = await connectDatabase()
   const authorizations = await db.fetchAllAuthorizations()
-  const dbCleanupOperations: Promise<string | undefined>[] = []
+  const dbCleanupOperations: Promise<string | void>[] = []
 
   authorizations.forEach((authorization) => {
+    const { userId, guildId } = authorization
+    const adminRoleResolvable = getGuildAdminRole(guildId)
+
     if (authorization.isExpired()) {
-      const { userId, guildId } = authorization
       dbCleanupOperations.push(
-        getGuildAdminRole(guildId)
+        adminRoleResolvable
           .then((adminRole) => removeGuildUserRole(guildId, userId, adminRole))
           .then(() => db.removeAuthorization(userId, guildId))
+          .catch((err) => {
+            if (!(err instanceof DiscordAPIError)) throw err
+
+            // Bot lacks access (removed from guild or guild deleted)
+            if (err.code === 50001) {
+              db.removeAllGuildAuthorizations(guildId)
+            } else {
+              console.error(err)
+            }
+          })
       )
+    } else {
+      const remainingMilliseconds = authorization.millisecondsUntilExpiration()
+
+      if (remainingMilliseconds < 0) {
+        console.warn(
+          'Reached non-expired logic block for expired authorization'
+        )
+      }
+
+      setTimeout(() => {
+        try {
+          adminRoleResolvable
+            .then((adminRole) =>
+              removeGuildUserRole(guildId, userId, adminRole)
+            )
+            .then(() => db.removeAuthorization(userId, guildId))
+        } catch (err) {
+          // Bot lacks access (removed from guild or guild deleted)
+          if (err instanceof DiscordAPIError && err.code === 50001) {
+            db.removeAllGuildAuthorizations(guildId)
+          } else {
+            console.error(err)
+          }
+        }
+      }, Math.max(remainingMilliseconds, 0))
     }
   })
 
