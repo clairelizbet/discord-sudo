@@ -37,6 +37,32 @@ Immediately drops your admin privileges.
 
 The bot will remove the admin role it assigned you (see `/sudo` for a description of how it finds the admin role).
 
+## Running a private instance
+
+You will need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
+
+Then you can run Sudo for Discord using either Node directly or using Docker.
+
+### Using Docker
+
+Set the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables and then run the container.
+
+```sh
+docker run -e DISCORD_CLIENT_ID -e DISCORD_CLIENT_SECRET clairelizbet/discord-sudo
+```
+
+### Without using Docker
+
+To run using Node, your host machine will need **Node 16** installed.
+
+After setting the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables, the bot can be started.
+
+```sh
+npm install
+npm run build
+npm start
+```
+
 ## License
 
 [![MIT License](https://raw.githubusercontent.com/clairelizbet/licenses/main/mit/mit.svg)](license.md)
