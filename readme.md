@@ -25,7 +25,7 @@ Parameters:
 - `duration`
   - How many minutes to grant admin access for
   - Optional
-  - Valid range: `5` (default) to `120`
+  - Valid range: `1` to `120` (default `5`)
 
 The bot will attempt to find an admin role that it has permission to manage, preferring those with "admin" in the name, and assign that role the user calling the command.
 
