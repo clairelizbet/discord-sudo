@@ -1,5 +1,9 @@
+# Source control metadata
+.git/
+
 # Used to provide environment variables for local development
 .env
+.env.example
 
 # Database of active sudo authorizations and command sync data
 sudo.db
