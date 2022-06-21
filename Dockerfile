@@ -12,6 +12,7 @@ USER node
 RUN npm config set update-notifier false
 RUN npm install --silent
 RUN npm run build
+RUN npm prune --omit=dev
 
 # Run
 ENV NODE_ENV=production

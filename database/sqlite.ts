@@ -15,12 +15,16 @@ enum DBTable {
 }
 
 class SQLiteDatabase extends BaseDatabase {
-  dbConn: Promise<Database>
+  private __internal__dbConn?: Promise<Database>
 
   constructor() {
     super()
+  }
 
-    this.dbConn = open({
+  get dbConn(): Promise<Database> {
+    if (this.__internal__dbConn) return this.__internal__dbConn
+
+    this.__internal__dbConn = open({
       filename: process.env.DB_SQLITE_PATH ?? './sudo.db',
       driver: sqlite3.cached.Database,
     }).then((conn) => {
@@ -35,6 +39,8 @@ class SQLiteDatabase extends BaseDatabase {
         )
         .then(() => conn)
     })
+
+    return this.__internal__dbConn
   }
 
   async fetchAllAuthorizations(): Promise<AuthorizationRecord[]> {

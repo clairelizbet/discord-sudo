@@ -1,4 +1,3 @@
-import 'dotenv/config'
 import { commands } from '../commands'
 import {
   connectDiscord,
@@ -11,6 +10,18 @@ import { connectDatabase } from '../database'
 import { DiscordAPIError } from 'discord.js'
 
 async function initialize(): Promise<void> {
+  try {
+    // Attempt to load config from .env
+    await import('dotenv/config')
+  } catch (e) {
+    // In we're outside production, dev dependencies should be installed
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(
+        "Couldn't load the dotenv module. Please check that dev dependencies are installed"
+      )
+    }
+  }
+
   const discordClient = await connectDiscord()
   const db = await connectDatabase()
   const authorizations = await db.fetchAllAuthorizations()
