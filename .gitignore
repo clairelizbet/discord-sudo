@@ -2,7 +2,7 @@
 .env
 
 # Database of active sudo authorizations and command sync data
-sudo.db
+sudo*.db
 
 # Third-party dependencies
 node_modules/
