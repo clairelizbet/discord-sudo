@@ -16,18 +16,12 @@ class SudoCommand extends BaseBotCommand {
   defaultUserPermissions: bigint
   acceptsDirectMessages: boolean
 
-  defaultDuration: number
-  maxDuration: number
-
   constructor() {
     super('sudo')
 
     this.description = 'Grants you temporary admin access'
     this.defaultUserPermissions = PermissionFlagsBits.Administrator
     this.acceptsDirectMessages = false
-
-    this.defaultDuration = intFromValue(process.env.DEFAULT_DURATION) ?? 5
-    this.maxDuration = intFromValue(process.env.MAX_DURATION) ?? 120
 
     this.options = [
       {
@@ -37,6 +31,14 @@ class SudoCommand extends BaseBotCommand {
         required: false,
       },
     ]
+  }
+
+  get defaultDuration(): number {
+    return intFromValue(process.env.DEFAULT_DURATION) ?? 5
+  }
+
+  get maxDuration(): number {
+    return intFromValue(process.env.MAX_DURATION) ?? 120
   }
 
   async handleInteraction(interaction: CommandInteraction): Promise<void> {

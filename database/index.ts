@@ -3,7 +3,6 @@ import { MemoryDatabase } from './memory'
 import { SQLiteDatabase } from './sqlite'
 
 let db: Database
-const dbDriver = process.env.DB_DRIVER ?? 'sqlite'
 const dbDriverMap: Map<string, new () => Database> = new Map()
 
 dbDriverMap.set('__DEVELOPMENT__memory', MemoryDatabase)
@@ -12,7 +11,7 @@ dbDriverMap.set('sqlite', SQLiteDatabase)
 async function connectDatabase(): Promise<Database> {
   if (db) return db
 
-  const driverName = String(dbDriver)
+  const driverName = String(process.env.DB_DRIVER ?? 'sqlite')
   const DBClass = dbDriverMap.get(driverName)
 
   if (DBClass) {
