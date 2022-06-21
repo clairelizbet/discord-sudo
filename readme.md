@@ -45,13 +45,24 @@ Then you can run Sudo for Discord using either Node directly or using Docker.
 
 ### Using Docker
 
-Set the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables and then run the container.
+Set the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables to the values for your Discord app.
+
+Create a persistent volume for the bot to use.
 
 ```sh
-docker run -e DISCORD_CLIENT_ID -e DISCORD_CLIENT_SECRET clairelizbet/discord-sudo
+docker volume create discord-sudo
 ```
 
-### Without using Docker
+Then run the container, attaching the volume and passing the environment variables.
+
+```sh
+docker run \
+  -e DISCORD_CLIENT_ID -e DISCORD_CLIENT_SECRET \
+  --mount source=discord-sudo,target=/app \
+  clairelizbet/discord-sudo
+```
+
+### Using Node
 
 To run using Node, your host machine will need **Node 16** installed.
 
@@ -60,6 +71,7 @@ After setting the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment va
 ```sh
 npm install
 npm run build
+npm prune --omit=dev ## Optionally remove dev dependencies
 npm start
 ```
 
