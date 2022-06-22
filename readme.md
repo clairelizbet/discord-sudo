@@ -58,7 +58,7 @@ Then run the container, attaching the volume and passing the environment variabl
 ```sh
 docker run \
   -e DISCORD_CLIENT_ID -e DISCORD_CLIENT_SECRET \
-  --mount source=discord-sudo,target=/app \
+  --mount source=discord-sudo,target=/app/storage \
   clairelizbet/discord-sudo
 ```
 

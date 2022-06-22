@@ -25,7 +25,7 @@ class SQLiteDatabase extends BaseDatabase {
     if (this.__internal__dbConn) return this.__internal__dbConn
 
     this.__internal__dbConn = open({
-      filename: process.env.DB_SQLITE_PATH ?? './sudo.db',
+      filename: process.env.DB_SQLITE_PATH ?? './storage/sudo.db',
       driver: sqlite3.cached.Database,
     }).then((conn) => {
       return conn
