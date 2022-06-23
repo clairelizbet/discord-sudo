@@ -76,9 +76,18 @@ async function syncCommands(commands: BotCommand[]): Promise<void> {
     await discordClient.application?.commands.fetch()
 
   if (!cloudCommands || cloudCommands.size === 0) {
-    await discordClient.application?.commands.set(
-      commands.map((cmd) => cmd.getData())
-    )
+    await discordClient.application?.commands
+      .set(commands.map((cmd) => cmd.getData()))
+      .then((syncedCommands) => {
+        syncedCommands.forEach((syncedCommand) => {
+          const command = commands.find(
+            (cmd) => cmd.name === syncedCommand.name
+          )
+
+          if (command)
+            getDatabase().registerCommandVersion(command, syncedCommand.version)
+        })
+      })
   } else {
     // Upload new commands that are local to the Discord cloud
     await Promise.all(
