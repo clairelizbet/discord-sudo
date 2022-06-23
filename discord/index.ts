@@ -68,7 +68,7 @@ function getDiscordREST(): REST {
 }
 
 async function syncCommands(commands: BotCommand[]): Promise<void> {
-  if (process.env.DEBUG_SKIP_COMMAND_SYNC) {
+  if (process.env.DEBUG_SKIP_COMMAND_SYNC?.toLowerCase().trim() === 'true') {
     return
   }
 
