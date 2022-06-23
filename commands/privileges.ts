@@ -1,5 +1,5 @@
 import { CommandInteraction } from 'discord.js'
-import { getGuildAdminRole, removeGuildUserRole } from '../discord'
+import { removeGuildUserRoles } from '../discord'
 import {
   ApplicationCommandOptionType,
   PermissionFlagsBits,
@@ -27,22 +27,17 @@ class PrivilegesCommand extends BaseBotCommand {
     ]
   }
 
-  async handleUnknown(interaction: CommandInteraction): Promise<void> {
-    interaction.reply({
-      content: `:warning: Unknwon command`,
-      ephemeral: true,
-    })
-    return
-  }
-
   async handleDrop(
     interaction: CommandInteraction
   ): Promise<string | undefined> {
     const { guild } = interaction
+    const activeCommandName = `${
+      interaction.commandName
+    } ${interaction.options.getSubcommand(false)}`
 
     if (!guild) {
       interaction.reply({
-        content: `:warning: The sudo command only works in guild channels`,
+        content: `:warning: The ${activeCommandName} command only works in guild channels`,
         ephemeral: true,
       })
       return
@@ -61,8 +56,11 @@ class PrivilegesCommand extends BaseBotCommand {
     }
 
     try {
-      const adminRole = await getGuildAdminRole(guild)
-      await removeGuildUserRole(guild, user, adminRole)
+      const userInfo = await guild.members.fetch(user.id)
+      const userAdminRoles = userInfo.roles.cache.filter((userRole) =>
+        userRole.permissions.has('ADMINISTRATOR')
+      )
+      await removeGuildUserRoles(guild, user, userAdminRoles)
       await getDatabase().removeAuthorization(user.id, guild)
 
       interaction.reply({
@@ -84,10 +82,10 @@ class PrivilegesCommand extends BaseBotCommand {
       if (interaction.options.getSubcommand() === 'drop') {
         await this.handleDrop(interaction)
       } else {
-        this.handleUnknown(interaction)
+        this.handleUnknownCommand(interaction)
       }
     } catch (e) {
-      this.handleUnknown(interaction)
+      this.handleUnknownCommand(interaction)
     }
 
     return

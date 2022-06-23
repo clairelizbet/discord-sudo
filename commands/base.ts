@@ -4,7 +4,11 @@ import {
   LocalizationMap,
   Permissions,
 } from 'discord-api-types/v9'
-import { Interaction, BaseApplicationCommandData } from 'discord.js'
+import {
+  Interaction,
+  BaseApplicationCommandData,
+  CommandInteraction,
+} from 'discord.js'
 
 interface CommandData {
   type: ApplicationCommandType
@@ -44,6 +48,14 @@ abstract class BaseBotCommand implements BotCommand {
     this.name = name
     this.description = ''
     this.type = ApplicationCommandType.ChatInput
+  }
+
+  async handleUnknownCommand(interaction: CommandInteraction): Promise<void> {
+    interaction.reply({
+      content: `:warning: Unknwon command`,
+      ephemeral: true,
+    })
+    return
   }
 
   abstract handleInteraction(interaction: Interaction): Promise<void>

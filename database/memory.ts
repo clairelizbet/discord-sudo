@@ -1,5 +1,5 @@
 import { isAfter } from 'date-fns'
-import { Guild, Snowflake, User } from 'discord.js'
+import { Guild, Role, Snowflake, User } from 'discord.js'
 import { BotCommand } from '../commands/base'
 import { BaseDatabase } from './base'
 import { AuthorizationRecord } from './models/AuthorizationRecord'
@@ -12,6 +12,7 @@ type GuildUserId = string
 class MemoryDatabase extends BaseDatabase {
   store: {
     authorizations: Map<GuildUserId, AuthorizationRecord>
+    adminRoles: Map<string, string>
     commandVersions: Map<string, string>
   }
 
@@ -19,6 +20,7 @@ class MemoryDatabase extends BaseDatabase {
     super()
     this.store = {
       authorizations: new Map(),
+      adminRoles: new Map(),
       commandVersions: new Map(),
     }
   }
@@ -87,6 +89,29 @@ class MemoryDatabase extends BaseDatabase {
     })
 
     return deletedIds
+  }
+
+  async registerGuildAdminRole(
+    role: Role | Snowflake,
+    guild: Guild | Snowflake
+  ): Promise<RecordId> {
+    const guildId = this.idForObject(guild)
+    this.store.adminRoles.set(guildId, this.idForObject(role))
+    return guildId
+  }
+
+  async clearGuildAdminRole(
+    guild: Guild | Snowflake
+  ): Promise<RecordId | undefined> {
+    const guildId = this.idForObject(guild)
+    return this.store.adminRoles.delete(guildId) ? guildId : undefined
+  }
+
+  async fetchGuildAdminRole(
+    guild: Guild | Snowflake
+  ): Promise<string | undefined> {
+    const guildId = this.idForObject(guild)
+    return this.store.adminRoles.get(guildId)
   }
 
   async registerCommandVersion(

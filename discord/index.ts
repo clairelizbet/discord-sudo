@@ -185,6 +185,20 @@ async function getGuildAdminRole(guild: Guild | Snowflake): Promise<Role> {
   type WeightdRole = { weight: number; role: Role }
 
   const targetGuild = await resolveGuild(guild)
+
+  const storedRoleId = await getDatabase().fetchGuildAdminRole(guild)
+  let storedRole: Role | null | undefined
+  if (storedRoleId) storedRole = await targetGuild.roles.fetch(storedRoleId)
+
+  // If the configured role exists but we can't manage it, throw an Error
+  if (storedRole && !storedRole.editable)
+    throw new Error(
+      `The bot doesn't have permission to manage <@&${storedRole.id}>. Please ensure the "sudo" role is placed above it and has the "Manage Roles" permission.`
+    )
+
+  // If the configured role exists and we can manage it, use that!
+  if (storedRole?.editable) return storedRole
+
   const allRoles = await targetGuild.roles.fetch()
   const weightedRoles: WeightdRole[] = []
 
@@ -224,14 +238,9 @@ async function getGuildAdminRole(guild: Guild | Snowflake): Promise<Role> {
     .filter((weightedRole) => weightedRole.role.editable)
     .pop()
 
-  if (!editableAdminRole && adminRoles.length > 1)
+  if (!editableAdminRole && adminRoles.length > 0)
     throw new Error(
-      "Admin role were found but the bot doesn't have permission to manage any of them"
-    )
-
-  if (!editableAdminRole && adminRoles.length === 1)
-    throw new Error(
-      "An admin role was found but the bot doesn't have permission to manage it"
+      'The bot doesn\'t have permission to manage the admin role. Please ensure the "sudo" role is placed above the admin role and has the "Manage Roles" permission.'
     )
 
   if (!editableAdminRole) throw new Error('No admin roles found')
@@ -239,36 +248,36 @@ async function getGuildAdminRole(guild: Guild | Snowflake): Promise<Role> {
   return editableAdminRole.role
 }
 
-async function grantGuildUserRole(
+async function grantGuildUserRoles(
   member: GuildMember,
-  role: Role
+  roles: Role | Collection<string, Role>
 ): Promise<GuildMember>
 
-async function grantGuildUserRole(
+async function grantGuildUserRoles(
   guild: Guild | Snowflake,
   user: User | Snowflake | APIUser,
-  role: Role
+  roles: Role | Collection<string, Role>
 ): Promise<GuildMember>
 
-async function grantGuildUserRole(
+async function grantGuildUserRoles(
   guildOrMember: Guild | Snowflake | GuildMember,
-  userOrRole: User | Snowflake | APIUser | Role,
-  role?: Role
+  userOrRoles: User | Snowflake | APIUser | Role | Collection<string, Role>,
+  roles?: Role | Collection<string, Role>
 ): Promise<GuildMember> {
-  const guildMember = await resolveGuildMember(guildOrMember, userOrRole)
-  return await guildMember.roles.add(role ?? (userOrRole as Role))
+  const guildMember = await resolveGuildMember(guildOrMember, userOrRoles)
+  return await guildMember.roles.add(roles ?? (userOrRoles as Role))
 }
 
-async function removeGuildUserRole(
+async function removeGuildUserRoles(
   guild: Guild | Snowflake,
   user: GuildMember | User | APIUser | Snowflake,
-  role: Role
+  roles: Role | Collection<string, Role>
 ): Promise<GuildMember> {
   const guildMember = await resolveGuildMember(guild, user)
-  return await guildMember.roles.remove(role)
+  return await guildMember.roles.remove(roles)
 }
 
 export { connectDiscord, syncCommands, getGuildAdminRole }
-export { grantGuildUserRole, removeGuildUserRole }
+export { grantGuildUserRoles, removeGuildUserRoles }
 export { resolveGuildMember }
 export { getDiscordClient, getDiscordREST }

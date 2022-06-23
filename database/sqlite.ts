@@ -1,7 +1,7 @@
 import sqlite3, { Statement } from 'sqlite3'
 import { Database, ISqlite, open } from 'sqlite'
 import { formatISO, isAfter } from 'date-fns'
-import { Guild, Snowflake, User } from 'discord.js'
+import { Guild, Role, Snowflake, User } from 'discord.js'
 import { BotCommand } from '../commands/base'
 import { BaseDatabase } from './base'
 import {
@@ -11,6 +11,7 @@ import {
 
 enum DBTable {
   Authorizations = 'authorizations',
+  GuildAdminRoles = 'guild_admin_roles',
   CommandVersions = 'command_versions',
 }
 
@@ -34,9 +35,15 @@ class SQLiteDatabase extends BaseDatabase {
         )
         .then(() =>
           conn.exec(
+            `CREATE TABLE IF NOT EXISTS ${DBTable.GuildAdminRoles} (guildId TEXT, roleId TEXT)`
+          )
+        )
+        .then(() =>
+          conn.exec(
             `CREATE TABLE IF NOT EXISTS ${DBTable.CommandVersions} (commandId TEXT, version TEXT)`
           )
         )
+
         .then(() => conn)
     })
 
@@ -171,6 +178,71 @@ class SQLiteDatabase extends BaseDatabase {
     return deletedIds
   }
 
+  async registerGuildAdminRole(
+    role: Role | Snowflake,
+    guild: Guild | Snowflake
+  ): Promise<RecordId> {
+    const db = await this.dbConn
+    let storeRes: ISqlite.RunResult<Statement> | undefined
+    const guildId = this.idForObject(guild)
+    const roleId = this.idForObject(role)
+
+    const fetchStatement = await db.prepare(
+      `SELECT rowid FROM ${DBTable.GuildAdminRoles} WHERE guildId = @guildId`
+    )
+    await fetchStatement.bind([guildId])
+    const existingRole: { rowid: number } | undefined =
+      await fetchStatement.get()
+
+    if (!existingRole) {
+      // Admin role has not yet been set for this guild
+      const insertStatement = await db.prepare(
+        `INSERT INTO ${DBTable.GuildAdminRoles} (guildId, roleId) VALUES (@guildId, @roleId)`
+      )
+      await insertStatement.bind([guildId, roleId])
+      storeRes = await insertStatement.run()
+    } else {
+      // A role is already stored, let's replace it
+      const updateStatement = await db.prepare(
+        `UPDATE ${DBTable.GuildAdminRoles} SET roleId = @roleId WHERE guildId = @guildId`
+      )
+      await updateStatement.bind([roleId, guildId])
+      storeRes = await updateStatement.run()
+    }
+
+    const recordId = storeRes?.lastID ?? existingRole?.rowid
+    return String(recordId)
+  }
+
+  async clearGuildAdminRole(
+    guild: Guild | Snowflake
+  ): Promise<RecordId | undefined> {
+    const db = await this.dbConn
+    const guildId = this.idForObject(guild)
+    const deleteStatement = await db.prepare(
+      `DELETE FROM ${DBTable.GuildAdminRoles} WHERE guildId = @guildId`
+    )
+    await deleteStatement.bind([guildId])
+    const storeRes = await deleteStatement.run()
+
+    return storeRes.lastID ? String(storeRes.lastID) : undefined
+  }
+
+  async fetchGuildAdminRole(
+    guild: Guild | Snowflake
+  ): Promise<string | undefined> {
+    const db = await this.dbConn
+    const guildId = this.idForObject(guild)
+    const fetchStatement = await db.prepare(
+      `SELECT roleId FROM ${DBTable.GuildAdminRoles} WHERE guildId = @guildId`
+    )
+    await fetchStatement.bind([guildId])
+    const roleRecord: { roleId: string } | undefined =
+      await fetchStatement.get()
+
+    return roleRecord?.roleId
+  }
+
   async registerCommandVersion(
     command: BotCommand,
     version: string
@@ -198,7 +270,7 @@ class SQLiteDatabase extends BaseDatabase {
     } else {
       // A version is already stored, let's replace it
       const updateStatement = await db.prepare(
-        `UPDATE ${DBTable.CommandVersions}  SET version = @version WHERE commandId = @commandId`
+        `UPDATE ${DBTable.CommandVersions} SET version = @version WHERE commandId = @commandId`
       )
       await updateStatement.bind([versionData.version, versionData.commandId])
       storeRes = await updateStatement.run()
@@ -214,7 +286,7 @@ class SQLiteDatabase extends BaseDatabase {
     const db = await this.dbConn
     const commandId = JSON.stringify(command)
     const deleteStatement = await db.prepare(
-      `DELETE FROM ${DBTable.CommandVersions}  WHERE commandId = @commandId`
+      `DELETE FROM ${DBTable.CommandVersions} WHERE commandId = @commandId`
     )
     await deleteStatement.bind([commandId])
     const storeRes = await deleteStatement.run()
@@ -225,7 +297,7 @@ class SQLiteDatabase extends BaseDatabase {
   async fetchCommandVersion(command: BotCommand): Promise<string | undefined> {
     const db = await this.dbConn
     const fetchStatement = await db.prepare(
-      `SELECT version FROM ${DBTable.CommandVersions}  WHERE commandId = @commandId`
+      `SELECT version FROM ${DBTable.CommandVersions} WHERE commandId = @commandId`
     )
     await fetchStatement.bind([JSON.stringify(command)])
     const versionRecord: { version: string } | undefined =
