@@ -1,5 +1,8 @@
 # Sudo for Discord
 
+[![](https://sonarcloud.io/api/project_badges/measure?project=clairelizbet_discord-sudo&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=clairelizbet_discord-sudo)
+[![](https://sonarcloud.io/api/project_badges/measure?project=clairelizbet_discord-sudo&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=clairelizbet_discord-sudo)
+
 Control access to admin privileges on your server with Sudo for Discord.
 
 Trusted members of your Discord guild can be given access to `/sudo` which grants temporary admin access so that each member is no longer required to have admin access all the time.
