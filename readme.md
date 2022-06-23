@@ -1,6 +1,8 @@
 # Sudo for Discord
 
-Control access to admin privileges on your server with Sudo for Discord
+Control access to admin privileges on your server with Sudo for Discord.
+
+Trusted members of your Discord guild can be given access to `/sudo` which grants temporary admin access so that each member is no longer required to have admin access all the time.
 
 ## Setup
 
