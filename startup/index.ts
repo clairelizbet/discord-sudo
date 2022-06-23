@@ -2,8 +2,7 @@ import { commands } from '../commands'
 import {
   connectDiscord,
   syncCommands,
-  getGuildAdminRole,
-  removeGuildUserRole,
+  removeGuildUserRoles,
   getDiscordClient,
 } from '../discord'
 import { connectDatabase } from '../database'
@@ -29,12 +28,21 @@ async function initialize(): Promise<void> {
 
   authorizations.forEach((authorization) => {
     const { userId, guildId } = authorization
-    const adminRoleResolvable = getGuildAdminRole(guildId)
+    const userAdminRolesResolvable = discordClient.guilds
+      .fetch(guildId)
+      .then((guild) => guild.members.fetch(userId))
+      .then((userInfo) =>
+        userInfo.roles.cache.filter((userRole) =>
+          userRole.permissions.has('ADMINISTRATOR')
+        )
+      )
 
     if (authorization.isExpired()) {
       dbCleanupOperations.push(
-        adminRoleResolvable
-          .then((adminRole) => removeGuildUserRole(guildId, userId, adminRole))
+        userAdminRolesResolvable
+          .then((adminRoles) =>
+            removeGuildUserRoles(guildId, userId, adminRoles)
+          )
           .then(() => db.removeAuthorization(userId, guildId))
           .catch((err) => {
             if (!(err instanceof DiscordAPIError)) throw err
@@ -58,9 +66,9 @@ async function initialize(): Promise<void> {
 
       setTimeout(() => {
         try {
-          adminRoleResolvable
-            .then((adminRole) =>
-              removeGuildUserRole(guildId, userId, adminRole)
+          userAdminRolesResolvable
+            .then((adminRoles) =>
+              removeGuildUserRoles(guildId, userId, adminRoles)
             )
             .then(() => db.removeAuthorization(userId, guildId))
         } catch (err) {

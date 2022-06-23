@@ -35,7 +35,22 @@ Alias: `/unsudo`
 
 Immediately drops your admin privileges.
 
-The bot will remove the admin role it assigned you (see `/sudo` for a description of how it finds the admin role).
+### `/sudo-config`
+
+Manages Sudo for Discord configuration.
+
+#### `/sudo-config set-admin-role`
+
+Sets the role assigned when granting admin.
+
+Parameters:
+
+- `role`
+  - The admin role to grant (bot must have permission to manage the role)
+
+#### `/sudo-config enable-admin-role-autoselect`
+
+Causes the bot to use any available admin role when granting admin. This is the default behavior.
 
 ## Running a private instance
 

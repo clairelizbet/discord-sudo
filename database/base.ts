@@ -1,4 +1,4 @@
-import { Snowflake, User, Guild } from 'discord.js'
+import { Snowflake, User, Guild, Role } from 'discord.js'
 import { AuthorizationRecord } from './models/AuthorizationRecord'
 import { BotCommand } from '../commands/base'
 
@@ -26,6 +26,15 @@ interface Database {
   ): Promise<RecordId | undefined>
 
   removeAllGuildAuthorizations(guild: Guild | Snowflake): Promise<RecordId[]>
+
+  registerGuildAdminRole(
+    role: Role | Snowflake,
+    guild: Guild | Snowflake
+  ): Promise<RecordId>
+
+  clearGuildAdminRole(guild: Guild | Snowflake): Promise<RecordId | undefined>
+
+  fetchGuildAdminRole(guild: Guild | Snowflake): Promise<string | undefined>
 
   registerCommandVersion(
     command: BotCommand,
@@ -63,6 +72,19 @@ abstract class BaseDatabase implements Database {
   abstract removeAllGuildAuthorizations(
     guild: Guild | Snowflake
   ): Promise<RecordId[]>
+
+  abstract registerGuildAdminRole(
+    role: Role | Snowflake,
+    guild: Guild | Snowflake
+  ): Promise<RecordId>
+
+  abstract clearGuildAdminRole(
+    guild: Guild | Snowflake
+  ): Promise<RecordId | undefined>
+
+  abstract fetchGuildAdminRole(
+    guild: Guild | Snowflake
+  ): Promise<string | undefined>
 
   abstract registerCommandVersion(
     command: BotCommand,

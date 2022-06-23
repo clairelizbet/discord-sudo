@@ -1,8 +1,8 @@
 import { CommandInteraction } from 'discord.js'
 import {
   getGuildAdminRole,
-  grantGuildUserRole,
-  removeGuildUserRole,
+  grantGuildUserRoles,
+  removeGuildUserRoles,
 } from '../discord'
 import {
   ApplicationCommandOptionType,
@@ -87,7 +87,7 @@ class SudoCommand extends BaseBotCommand {
     try {
       const adminRole = await getGuildAdminRole(guild)
       await getDatabase().storeAuthorization(user.id, guild, duration)
-      await grantGuildUserRole(guild, user, adminRole)
+      await grantGuildUserRoles(guild, user, adminRole)
 
       interaction.reply({
         content: `:white_check_mark: Admin access granted for ${duration} minute${
@@ -98,9 +98,18 @@ class SudoCommand extends BaseBotCommand {
 
       setTimeout(() => {
         try {
-          removeGuildUserRole(guild, user, adminRole).then(() =>
-            getDatabase().removeAuthorization(user.id, guild)
-          )
+          guild.members
+            .fetch(user.id)
+            .then((userInfo) =>
+              userInfo.roles.cache.filter((userRole) =>
+                userRole.permissions.has('ADMINISTRATOR')
+              )
+            )
+            .then((userAdminRoles) =>
+              removeGuildUserRoles(guild, user, userAdminRoles).then(() =>
+                getDatabase().removeAuthorization(user.id, guild)
+              )
+            )
         } catch (e) {
           console.error(e)
         }
