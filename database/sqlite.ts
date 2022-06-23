@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+import { promisify } from 'util'
 import sqlite3, { Statement } from 'sqlite3'
 import { Database, ISqlite, open } from 'sqlite'
 import { formatISO, isAfter } from 'date-fns'
@@ -25,27 +28,42 @@ class SQLiteDatabase extends BaseDatabase {
   get dbConn(): Promise<Database> {
     if (this.__internal__dbConn) return this.__internal__dbConn
 
-    this.__internal__dbConn = open({
-      filename: process.env.DB_SQLITE_PATH ?? './storage/sudo.db',
-      driver: sqlite3.cached.Database,
-    }).then((conn) => {
-      return conn
-        .exec(
-          `CREATE TABLE IF NOT EXISTS ${DBTable.Authorizations} (userId TEXT, guildId TEXT, start TEXT, duration INTEGER)`
-        )
-        .then(() =>
-          conn.exec(
-            `CREATE TABLE IF NOT EXISTS ${DBTable.GuildAdminRoles} (guildId TEXT, roleId TEXT)`
-          )
-        )
-        .then(() =>
-          conn.exec(
-            `CREATE TABLE IF NOT EXISTS ${DBTable.CommandVersions} (commandId TEXT, version TEXT)`
-          )
-        )
+    const dbPath = process.env.DB_SQLITE_PATH ?? './storage/sudo.db'
+    const checkAccess = promisify(fs.access)
+    const mkdirp = (path: fs.PathLike) =>
+      promisify(fs.mkdir)(path, { recursive: true })
 
-        .then(() => conn)
-    })
+    this.__internal__dbConn = new Promise((resolve, reject) => {
+      checkAccess(path.dirname(dbPath))
+        .then(() => resolve(true))
+        .catch(() =>
+          mkdirp(path.dirname(dbPath))
+            .catch((err) => reject(err))
+            .then(() => resolve(true))
+        )
+    }).then(() =>
+      open({
+        filename: dbPath,
+        driver: sqlite3.cached.Database,
+      }).then((conn) => {
+        return conn
+          .exec(
+            `CREATE TABLE IF NOT EXISTS ${DBTable.Authorizations} (userId TEXT, guildId TEXT, start TEXT, duration INTEGER)`
+          )
+          .then(() =>
+            conn.exec(
+              `CREATE TABLE IF NOT EXISTS ${DBTable.GuildAdminRoles} (guildId TEXT, roleId TEXT)`
+            )
+          )
+          .then(() =>
+            conn.exec(
+              `CREATE TABLE IF NOT EXISTS ${DBTable.CommandVersions} (commandId TEXT, version TEXT)`
+            )
+          )
+
+          .then(() => conn)
+      })
+    )
 
     return this.__internal__dbConn
   }
