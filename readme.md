@@ -5,7 +5,7 @@
 
 Control access to admin privileges on your server with Sudo for Discord.
 
-Trusted members of your guild can use `/sudo` to temporarily gain admin access when needed, preventing accidental administrative actions (e.g. reordering channels).
+Trusted members of your guild can use `/sudo` to temporarily gain admin access when needed, offering a more secure alternative to direct access and preventing accidental administrative actions.
 
 ## ⚙ Setup
 
@@ -57,19 +57,29 @@ Alias: `/unsudo`
 
 > Causes the bot to use any available admin role when granting admin. This is the default behavior.
 
-## 🛠 Running a private instance
+## ☁ Running a private instance
 
-🌐 There is a public instance of the bot that you can [install in your guild](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands). This is the recommended way to add the bot.
+> 🌐 There is a [public instance available](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands). This is the recommended way to add the bot.
 
-If you would rather self-host the bot, you will first need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
+If you would rather self-host Sudo, you will first need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
 
 Then you can run Sudo for Discord either containerized with Docker or using Node directly.
 
+**🛠 Setting up the environment**
+
+Before running the bot, you will need to set these required **environment variables** for the app.
+
+> These variables are typically configured in your hypervisor or container manager.
+
+`DISCORD_CLIENT_ID`
+
+`DISCORD_CLIENT_SECRET`
+
+Check [.env.example](.env.example) for a full list of optional environment variables for configuring the bot.
+
 ### 🛳 Using Docker
 
-Set the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables for the app in your container manager or host.
-
-Then run the container, attaching a persistent volume and passing the environment variables.
+Run the container, attaching a persistent volume for storage and passing the environment variables.
 
 ```sh
 docker run \
@@ -91,7 +101,7 @@ npm run build
 npm prune --omit=dev
 ```
 
-After setting the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables, run the bot with `npm start`
+Run the bot with `npm start`
 
 ## 📋 License
 
