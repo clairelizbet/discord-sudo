@@ -59,7 +59,7 @@ Alias: `/unsudo`
 
 ## 🛠 Running a private instance
 
-🌐 There is a public instance of the bot that you can [install in your guild](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands). This is the recommended way of adding the bot.
+🌐 There is a public instance of the bot that you can [install in your guild](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands). This is the recommended way to add the bot.
 
 If you would rather self-host the bot, you will first need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
 
@@ -93,6 +93,6 @@ npm prune --omit=dev
 
 After setting the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables, run the bot with `npm start`
 
-## License
+## 📋 License
 
-[![MIT License](https://raw.githubusercontent.com/clairelizbet/licenses/main/mit/mit.svg)](license.md)
+[![MIT License - Some rights reserved](https://raw.githubusercontent.com/clairelizbet/licenses/main/mit/mit.svg)](license.md)
