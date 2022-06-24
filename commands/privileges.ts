@@ -60,7 +60,12 @@ class PrivilegesCommand extends BaseBotCommand {
       const userAdminRoles = userInfo.roles.cache.filter((userRole) =>
         userRole.permissions.has('ADMINISTRATOR')
       )
-      await removeGuildUserRoles(guild, user.id, userAdminRoles)
+      await removeGuildUserRoles(
+        guild,
+        user.id,
+        userAdminRoles,
+        'Privilege drop requested'
+      )
       await getDatabase().removeAuthorization(user.id, guild)
 
       interaction.reply({

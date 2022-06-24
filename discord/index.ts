@@ -280,10 +280,11 @@ async function grantGuildUserRoles(
 async function removeGuildUserRoles(
   guild: Guild | Snowflake,
   user: GuildMember | User | APIUser | Snowflake,
-  roles: Role | Collection<string, Role>
+  roles: Role | Collection<string, Role>,
+  reason?: string
 ): Promise<GuildMember> {
   const guildMember = await resolveGuildMember(guild, user)
-  return await guildMember.roles.remove(roles)
+  return await guildMember.roles.remove(roles, reason)
 }
 
 export { connectDiscord, syncCommands, getGuildAdminRole }

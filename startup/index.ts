@@ -42,7 +42,12 @@ async function initialize(): Promise<void> {
       dbCleanupOperations.push(
         userAdminRolesResolvable
           .then((adminRoles) =>
-            removeGuildUserRoles(guildId, userId, adminRoles)
+            removeGuildUserRoles(
+              guildId,
+              userId,
+              adminRoles,
+              'Session expired while bot was disconnected'
+            )
           )
           .then(() => db.removeAuthorization(userId, guildId))
           .catch((err) => {
@@ -72,7 +77,12 @@ async function initialize(): Promise<void> {
           try {
             userAdminRolesResolvable
               .then((adminRoles) =>
-                removeGuildUserRoles(guildId, userId, adminRoles)
+                removeGuildUserRoles(
+                  guildId,
+                  userId,
+                  adminRoles,
+                  'Session expired'
+                )
               )
               .then(() => db.removeAuthorization(userId, guildId))
           } catch (err) {
