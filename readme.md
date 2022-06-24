@@ -32,7 +32,7 @@ Parameters:
   - Optional
   - Valid range: `1` to `120` (default `5`)
 
-The bot will attempt to find an admin role that it has permission to manage, preferring those with "admin" in the name, and assign that role the user calling the command.
+The bot will either use the admin role you've configured or attempt to find an admin role that it has permission to manage, preferring those with "admin" in the name, and assign that role the guild member calling the command.
 
 ### `/privileges drop`
 
