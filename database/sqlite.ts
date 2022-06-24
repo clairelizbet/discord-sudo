@@ -3,7 +3,7 @@ import path from 'path'
 import { promisify } from 'util'
 import sqlite3, { Statement } from 'sqlite3'
 import { Database, ISqlite, open } from 'sqlite'
-import { formatISO, isAfter } from 'date-fns'
+import { formatISO } from 'date-fns'
 import { Guild, Role, Snowflake, User } from 'discord.js'
 import { BotCommand } from '../commands/base'
 import { BaseDatabase } from './base'
@@ -129,12 +129,8 @@ class SQLiteDatabase extends BaseDatabase {
         authData.duration,
       ])
       storeRes = await insertStatement.run()
-    } else if (
-      isAfter(
-        new AuthorizationRecord(authData).expiration,
-        new AuthorizationRecord(existingAuthData).expiration
-      )
-    ) {
+    } else {
+      // Replace existing authorization
       const updateStatement = await db.prepare(
         `UPDATE ${DBTable.Authorizations} SET start = @start, duration = @duration WHERE userId = @userId AND guildId = @guildId`
       )
@@ -145,8 +141,6 @@ class SQLiteDatabase extends BaseDatabase {
         authData.guildId,
       ])
       storeRes = await updateStatement.run()
-    } else {
-      // Requesting a second authorization that expires before the current one is a no-op
     }
 
     const recordId = storeRes?.lastID ?? existingAuthData?.rowid

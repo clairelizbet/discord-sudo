@@ -1,4 +1,3 @@
-import { isAfter } from 'date-fns'
 import { Guild, Role, Snowflake, User } from 'discord.js'
 import { BotCommand } from '../commands/base'
 import { BaseDatabase } from './base'
@@ -49,23 +48,14 @@ class MemoryDatabase extends BaseDatabase {
     duration: Minutes
   ): Promise<RecordId> {
     const recordId = this.makeGuildUserId(user, guild)
-    const existingAuthorization = await this.fetchAuthorization(user, guild)
-    const requestedAuthorization = new AuthorizationRecord(
-      this.idForObject(user),
-      this.idForObject(guild),
-      duration
-    )
-
-    // Requesting a second authorization that expires before the current one is a no-op
-    if (
-      !existingAuthorization ||
-      isAfter(
-        requestedAuthorization.expiration,
-        existingAuthorization.expiration
+    this.store.authorizations.set(
+      recordId,
+      new AuthorizationRecord(
+        this.idForObject(user),
+        this.idForObject(guild),
+        duration
       )
-    ) {
-      this.store.authorizations.set(recordId, requestedAuthorization)
-    }
+    )
 
     return recordId
   }
