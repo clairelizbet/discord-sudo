@@ -11,6 +11,7 @@ import {
 import { intFromValue } from '../util/number'
 import { BaseBotCommand } from './base'
 import { getDatabase } from '../database'
+import { setTimer } from '../timers'
 
 class SudoCommand extends BaseBotCommand {
   defaultUserPermissions: bigint
@@ -87,7 +88,7 @@ class SudoCommand extends BaseBotCommand {
     try {
       const adminRole = await getGuildAdminRole(guild)
       await getDatabase().storeAuthorization(user.id, guild, duration)
-      await grantGuildUserRoles(guild, user, adminRole)
+      await grantGuildUserRoles(guild, user.id, adminRole)
 
       interaction.reply({
         content: `:white_check_mark: Admin access granted for ${duration} minute${
@@ -96,24 +97,29 @@ class SudoCommand extends BaseBotCommand {
         ephemeral: true,
       })
 
-      setTimeout(() => {
-        try {
-          guild.members
-            .fetch(user.id)
-            .then((userInfo) =>
-              userInfo.roles.cache.filter((userRole) =>
-                userRole.permissions.has('ADMINISTRATOR')
+      setTimer(
+        guild.id,
+        user.id,
+        () => {
+          try {
+            guild.members
+              .fetch(user.id)
+              .then((userInfo) =>
+                userInfo.roles.cache.filter((userRole) =>
+                  userRole.permissions.has('ADMINISTRATOR')
+                )
               )
-            )
-            .then((userAdminRoles) =>
-              removeGuildUserRoles(guild, user, userAdminRoles).then(() =>
-                getDatabase().removeAuthorization(user.id, guild)
+              .then((userAdminRoles) =>
+                removeGuildUserRoles(guild, user.id, userAdminRoles).then(() =>
+                  getDatabase().removeAuthorization(user.id, guild)
+                )
               )
-            )
-        } catch (e) {
-          console.error(e)
-        }
-      }, 1000 * 60 * duration)
+          } catch (e) {
+            console.error(e)
+          }
+        },
+        1000 * 60 * duration
+      )
     } catch (e) {
       interaction.reply({
         content: `:warning: Unable to grant admin access ${
