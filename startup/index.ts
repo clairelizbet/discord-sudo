@@ -7,6 +7,7 @@ import {
 } from '../discord'
 import { connectDatabase } from '../database'
 import { DiscordAPIError } from 'discord.js'
+import { setTimer } from '../timers'
 
 async function initialize(): Promise<void> {
   try {
@@ -64,22 +65,27 @@ async function initialize(): Promise<void> {
         )
       }
 
-      setTimeout(() => {
-        try {
-          userAdminRolesResolvable
-            .then((adminRoles) =>
-              removeGuildUserRoles(guildId, userId, adminRoles)
-            )
-            .then(() => db.removeAuthorization(userId, guildId))
-        } catch (err) {
-          // Bot lacks access (removed from guild or guild deleted)
-          if (err instanceof DiscordAPIError && err.code === 50001) {
-            db.removeAllGuildAuthorizations(guildId)
-          } else {
-            console.error(err)
+      setTimer(
+        guildId,
+        userId,
+        () => {
+          try {
+            userAdminRolesResolvable
+              .then((adminRoles) =>
+                removeGuildUserRoles(guildId, userId, adminRoles)
+              )
+              .then(() => db.removeAuthorization(userId, guildId))
+          } catch (err) {
+            // Bot lacks access (removed from guild or guild deleted)
+            if (err instanceof DiscordAPIError && err.code === 50001) {
+              db.removeAllGuildAuthorizations(guildId)
+            } else {
+              console.error(err)
+            }
           }
-        }
-      }, Math.max(remainingMilliseconds, 0))
+        },
+        Math.max(remainingMilliseconds, 0)
+      )
     }
   })
 

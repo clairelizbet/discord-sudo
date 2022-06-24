@@ -54,7 +54,7 @@ class AuthorizationRecord implements AuthorizationRecordData {
     return isPast(this.expiration)
   }
 
-  millisecondsUntilExpiration(): number {
+  millisecondsUntilExpiration(): Milliseconds {
     return differenceInMilliseconds(this.expiration, Date.now())
   }
 }
