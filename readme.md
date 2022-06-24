@@ -1,99 +1,97 @@
-# Sudo for Discord
+# 🔓 Sudo for Discord
 
 [![](https://sonarcloud.io/api/project_badges/measure?project=clairelizbet_discord-sudo&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=clairelizbet_discord-sudo)
 [![](https://sonarcloud.io/api/project_badges/measure?project=clairelizbet_discord-sudo&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=clairelizbet_discord-sudo)
 
 Control access to admin privileges on your server with Sudo for Discord.
 
-Trusted members of your Discord guild can be given access to `/sudo` which grants temporary admin access so that each member is no longer required to have admin access all the time.
+Trusted members of your guild can use `/sudo` to temporarily gain admin access when needed, preventing accidental administrative actions (e.g. reordering channels).
 
-## Setup
+## ⚙ Setup
 
 [![Add to Server](https://i.imgur.com/FnjVKEb.png)](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands)
 
-After adding the bot to your server, place the newly created "sudo" role above the admin role you would like the bot to manage
+↕ After adding the bot, place the auto-created `sudo` role **above** the admin role you would like the bot to manage
 
 ![To do this, go to Server Settings > Roles and drag "sudo" adove the admin role](https://i.imgur.com/DxKcOVq.gif)
 
-Next, you'll need to choose which users or roles have permission to use sudo. To change this, visit Server Settings > Integrations > sudo.
+🔑 Next, choose which users or roles have permission to use sudo in Server Settings > Integrations > Sudo
 
 ![Here you can control who has access to the command](https://i.imgur.com/bPRhPFv.png)
 
-## Usage
+## ℹ Usage
 
 ### `/sudo`
 
-Temporarily grants admin access.
-
-Parameters:
-
-- `duration`
-  - How many minutes to grant admin access for
-  - Optional
-  - Valid range: `1` to `120` (default `5`)
-
-The bot will either use the admin role you've configured or attempt to find an admin role that it has permission to manage, preferring those with "admin" in the name, and assign that role the guild member calling the command.
+> Temporarily grants admin access.
+>
+> Parameters:
+>
+> - `duration`
+>   - How many minutes to grant admin access for
+>   - Optional
+>   - Valid range: `1` to `120` (default `5`)
+>
+> The bot will either use the admin role you've configured or attempt to find an admin role that it has permission to manage, preferring those with "admin" in the name, and assign that role the guild member calling the command.
 
 ### `/privileges drop`
 
 Alias: `/unsudo`
 
-Immediately drops your admin privileges.
+> Immediately drops your admin privileges.
 
 ### `/sudo-config`
 
-Manages Sudo for Discord configuration.
+> Manages Sudo for Discord configuration.
 
 #### `/sudo-config set-admin-role`
 
-Sets the role assigned when granting admin.
-
-Parameters:
-
-- `role`
-  - The admin role to grant (bot must have permission to manage the role)
+> Sets the role assigned when granting admin.
+>
+> Parameters:
+>
+> - `role`
+>   - The admin role to grant (bot must have permission to manage the role)
 
 #### `/sudo-config enable-admin-role-autoselect`
 
-Causes the bot to use any available admin role when granting admin. This is the default behavior.
+> Causes the bot to use any available admin role when granting admin. This is the default behavior.
 
-## Running a private instance
+## 🛠 Running a private instance
 
-You will need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
+🌐 There is a public instance of the bot that you can [install in your guild](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands). This is the recommended way of adding the bot.
 
-Then you can run Sudo for Discord using either Node directly or using Docker.
+If you would rather self-host the bot, you will first need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
 
-### Using Docker
+Then you can run Sudo for Discord either containerized with Docker or using Node directly.
 
-Set the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables to the values for your Discord app.
+### 🛳 Using Docker
 
-Create a persistent volume for the bot to use.
+Set the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables for the app in your container manager or host.
 
-```sh
-docker volume create discord-sudo
-```
-
-Then run the container, attaching the volume and passing the environment variables.
+Then run the container, attaching a persistent volume and passing the environment variables.
 
 ```sh
 docker run \
   -e DISCORD_CLIENT_ID -e DISCORD_CLIENT_SECRET \
-  --mount source=discord-sudo,target=/app/storage \
+  --mount source=discord-sudo-data,target=/app/storage \
   clairelizbet/discord-sudo
 ```
 
-### Using Node
+### 📦 Using Node
 
 To run using Node, your host machine will need **Node 16** installed.
 
-After setting the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables, the bot can be started.
-
 ```sh
+# Installs third-party packages the bot depends on
 npm install
+# Compiles TypeScript to JS that Node can run
 npm run build
-npm prune --omit=dev ## Optionally remove dev dependencies
-npm start
+# Optionally, remove dev dependencies
+npm prune --omit=dev
 ```
+
+After setting the `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET` environment variables, run the bot with `npm start`
 
 ## License
 
