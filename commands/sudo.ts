@@ -110,9 +110,12 @@ class SudoCommand extends BaseBotCommand {
                 )
               )
               .then((userAdminRoles) =>
-                removeGuildUserRoles(guild, user.id, userAdminRoles).then(() =>
-                  getDatabase().removeAuthorization(user.id, guild)
-                )
+                removeGuildUserRoles(
+                  guild,
+                  user.id,
+                  userAdminRoles,
+                  'Session expired'
+                ).then(() => getDatabase().removeAuthorization(user.id, guild))
               )
           } catch (e) {
             console.error(e)
