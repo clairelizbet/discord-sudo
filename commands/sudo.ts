@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import {
   getGuildAdminRole,
   grantGuildUserRoles,
@@ -12,6 +12,7 @@ import { intFromValue } from '../util/number'
 import { BaseBotCommand } from './base'
 import { getDatabase } from '../database'
 import { setTimer } from '../timers'
+import { idForObject } from '../util/object'
 
 class SudoCommand extends BaseBotCommand {
   defaultUserPermissions: bigint
@@ -42,7 +43,9 @@ class SudoCommand extends BaseBotCommand {
     return intFromValue(process.env.MAX_DURATION) ?? 120
   }
 
-  async handleInteraction(interaction: CommandInteraction): Promise<void> {
+  async handleInteraction(
+    interaction: ChatInputCommandInteraction
+  ): Promise<void> {
     const { guild } = interaction
 
     if (!guild) {
@@ -53,11 +56,9 @@ class SudoCommand extends BaseBotCommand {
       return
     }
 
-    const user = interaction.isUserContextMenu()
-      ? interaction.targetMember?.user
-      : interaction.member?.user
+    const userId = idForObject(interaction.member?.user)
 
-    if (!user) {
+    if (!userId) {
       interaction.reply({
         content: `:warning: Unable to grant admin access - no guild member target`,
         ephemeral: true,
@@ -87,8 +88,8 @@ class SudoCommand extends BaseBotCommand {
 
     try {
       const adminRole = await getGuildAdminRole(guild)
-      await getDatabase().storeAuthorization(user.id, guild, duration)
-      await grantGuildUserRoles(guild, user.id, adminRole)
+      await getDatabase().storeAuthorization(userId, guild, duration)
+      await grantGuildUserRoles(guild, userId, adminRole)
 
       interaction.reply({
         content: `:white_check_mark: Admin access granted for ${duration} minute${
@@ -99,23 +100,23 @@ class SudoCommand extends BaseBotCommand {
 
       setTimer(
         guild.id,
-        user.id,
+        userId,
         () => {
           try {
             guild.members
-              .fetch(user.id)
+              .fetch(userId)
               .then((userInfo) =>
                 userInfo.roles.cache.filter((userRole) =>
-                  userRole.permissions.has('ADMINISTRATOR')
+                  userRole.permissions.has(PermissionFlagsBits.Administrator)
                 )
               )
               .then((userAdminRoles) =>
                 removeGuildUserRoles(
                   guild,
-                  user.id,
+                  userId,
                   userAdminRoles,
                   'Session expired'
-                ).then(() => getDatabase().removeAuthorization(user.id, guild))
+                ).then(() => getDatabase().removeAuthorization(userId, guild))
               )
           } catch (e) {
             console.error(e)

@@ -1,4 +1,5 @@
 import { Guild, Role, Snowflake, User } from 'discord.js'
+import { idForObject } from '../util/object'
 import { BotCommand } from '../commands/base'
 import { BaseDatabase } from './base'
 import { AuthorizationRecord } from './models/AuthorizationRecord'
@@ -28,7 +29,7 @@ class MemoryDatabase extends BaseDatabase {
     user: User | Snowflake,
     guild: Guild | Snowflake
   ): GuildUserId {
-    return `${this.idForObject(user)}:${this.idForObject(guild)}`
+    return `${idForObject(user)}:${idForObject(guild)}`
   }
 
   async fetchAllAuthorizations(): Promise<AuthorizationRecord[]> {
@@ -50,11 +51,7 @@ class MemoryDatabase extends BaseDatabase {
     const recordId = this.makeGuildUserId(user, guild)
     this.store.authorizations.set(
       recordId,
-      new AuthorizationRecord(
-        this.idForObject(user),
-        this.idForObject(guild),
-        duration
-      )
+      new AuthorizationRecord(idForObject(user), idForObject(guild), duration)
     )
 
     return recordId
@@ -85,22 +82,22 @@ class MemoryDatabase extends BaseDatabase {
     role: Role | Snowflake,
     guild: Guild | Snowflake
   ): Promise<RecordId> {
-    const guildId = this.idForObject(guild)
-    this.store.adminRoles.set(guildId, this.idForObject(role))
+    const guildId = idForObject(guild)
+    this.store.adminRoles.set(guildId, idForObject(role))
     return guildId
   }
 
   async clearGuildAdminRole(
     guild: Guild | Snowflake
   ): Promise<RecordId | undefined> {
-    const guildId = this.idForObject(guild)
+    const guildId = idForObject(guild)
     return this.store.adminRoles.delete(guildId) ? guildId : undefined
   }
 
   async fetchGuildAdminRole(
     guild: Guild | Snowflake
   ): Promise<string | undefined> {
-    const guildId = this.idForObject(guild)
+    const guildId = idForObject(guild)
     return this.store.adminRoles.get(guildId)
   }
 

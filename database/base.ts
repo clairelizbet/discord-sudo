@@ -2,10 +2,6 @@ import { Snowflake, User, Guild, Role } from 'discord.js'
 import { AuthorizationRecord } from './models/AuthorizationRecord'
 import { BotCommand } from '../commands/base'
 
-type ObjectWithId = {
-  id: string
-}
-
 interface Database {
   fetchAllAuthorizations(): Promise<AuthorizationRecord[]>
 
@@ -47,10 +43,6 @@ interface Database {
 }
 
 abstract class BaseDatabase implements Database {
-  idForObject(obj: ObjectWithId | string): string {
-    return typeof obj === 'string' ? obj : obj.id
-  }
-
   abstract fetchAllAuthorizations(): Promise<AuthorizationRecord[]>
 
   abstract fetchAuthorization(

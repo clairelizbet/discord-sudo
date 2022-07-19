@@ -6,7 +6,7 @@ import {
   Collection,
   Guild,
   GuildMember,
-  Intents,
+  GatewayIntentBits,
   Role,
   User,
 } from 'discord.js'
@@ -39,7 +39,7 @@ async function connectDiscord(): Promise<Client> {
       resolve(discordClient)
     }
 
-    discordClient = new Client({ intents: [Intents.FLAGS.GUILDS] })
+    discordClient = new Client({ intents: [GatewayIntentBits.Guilds] })
     discordREST = new REST({ version: '9' }).setToken(CLIENT_TOKEN)
 
     discordClient.addListener('ready', resolveConnection)
@@ -213,7 +213,7 @@ async function getGuildAdminRole(guild: Guild | Snowflake): Promise<Role> {
 
   allRoles
     // Role MUST have admin privs
-    .filter((role) => role.permissions.has('ADMINISTRATOR'))
+    .filter((role) => role.permissions.has(PermissionFlagsBits.Administrator))
     .map((role) => {
       let weight = 1
 

@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { PrivilegesCommand } from './privileges'
 
 class UnsudoCommand extends PrivilegesCommand {
@@ -10,7 +10,9 @@ class UnsudoCommand extends PrivilegesCommand {
     this.options = []
   }
 
-  async handleInteraction(interaction: CommandInteraction): Promise<void> {
+  async handleInteraction(
+    interaction: ChatInputCommandInteraction
+  ): Promise<void> {
     await this.handleDrop(interaction)
     return
   }

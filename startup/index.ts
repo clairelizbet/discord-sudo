@@ -6,7 +6,11 @@ import {
   getDiscordClient,
 } from '../discord'
 import { connectDatabase } from '../database'
-import { DiscordAPIError } from 'discord.js'
+import {
+  DiscordAPIError,
+  InteractionType,
+  PermissionFlagsBits,
+} from 'discord.js'
 import { setTimer } from '../timers'
 
 async function initialize(): Promise<void> {
@@ -34,7 +38,7 @@ async function initialize(): Promise<void> {
       .then((guild) => guild.members.fetch(userId))
       .then((userInfo) =>
         userInfo.roles.cache.filter((userRole) =>
-          userRole.permissions.has('ADMINISTRATOR')
+          userRole.permissions.has(PermissionFlagsBits.Administrator)
         )
       )
 
@@ -112,7 +116,7 @@ function attachCommandListeners() {
   const discordClient = getDiscordClient()
 
   discordClient.on('interactionCreate', (interaction) => {
-    if (!interaction.isApplicationCommand()) return
+    if (interaction.type !== InteractionType.ApplicationCommand) return
 
     commands
       .find((cmd) => cmd.name === interaction.commandName)
