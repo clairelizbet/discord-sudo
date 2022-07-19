@@ -5,6 +5,7 @@ import sqlite3, { Statement } from 'sqlite3'
 import { Database, ISqlite, open } from 'sqlite'
 import { formatISO } from 'date-fns'
 import { Guild, Role, Snowflake, User } from 'discord.js'
+import { idForObject } from '../util/object'
 import { BotCommand } from '../commands/base'
 import { BaseDatabase } from './base'
 import {
@@ -86,7 +87,7 @@ class SQLiteDatabase extends BaseDatabase {
     const statement = await db.prepare(
       `SELECT userId, guildId, start, duration FROM ${DBTable.Authorizations} WHERE userId = @userId AND guildId = @guildId`
     )
-    await statement.bind([this.idForObject(user), this.idForObject(guild)])
+    await statement.bind([idForObject(user), idForObject(guild)])
     const storedRecordData: AuthorizationRecordData | undefined =
       await statement.get()
 
@@ -103,8 +104,8 @@ class SQLiteDatabase extends BaseDatabase {
     const db = await this.dbConn
     let storeRes: ISqlite.RunResult<Statement> | undefined
     const authData: AuthorizationRecordData = {
-      userId: this.idForObject(user),
-      guildId: this.idForObject(guild),
+      userId: idForObject(user),
+      guildId: idForObject(guild),
       start: formatISO(Date.now()),
       duration,
     }
@@ -112,7 +113,7 @@ class SQLiteDatabase extends BaseDatabase {
     const fetchStatement = await db.prepare(
       `SELECT rowid, userId, guildId, start, duration FROM ${DBTable.Authorizations} WHERE userId = @userId AND guildId = @guildId`
     )
-    await fetchStatement.bind([this.idForObject(user), this.idForObject(guild)])
+    await fetchStatement.bind([idForObject(user), idForObject(guild)])
     const existingAuthData:
       | (AuthorizationRecordData & { rowid: number })
       | undefined = await fetchStatement.get()
@@ -155,10 +156,7 @@ class SQLiteDatabase extends BaseDatabase {
     const deleteStatement = await db.prepare(
       `DELETE FROM ${DBTable.Authorizations} WHERE userId = @userId AND guildId = @guildId`
     )
-    await deleteStatement.bind([
-      this.idForObject(user),
-      this.idForObject(guild),
-    ])
+    await deleteStatement.bind([idForObject(user), idForObject(guild)])
     const res = await deleteStatement.run()
 
     return res.lastID ? String(res.lastID) : undefined
@@ -176,7 +174,7 @@ class SQLiteDatabase extends BaseDatabase {
     const fetchStatement = await db.prepare(
       `SELECT rowid FROM ${DBTable.Authorizations} WHERE guildId = @guildId`
     )
-    await fetchStatement.bind([this.idForObject(guild)])
+    await fetchStatement.bind([idForObject(guild)])
     const fetchRes = await fetchStatement.all()
     const deletedIds = fetchRes.map((row: { rowid: string }) => row.rowid)
 
@@ -184,7 +182,7 @@ class SQLiteDatabase extends BaseDatabase {
       `DELETE FROM ${DBTable.Authorizations} WHERE guildId = @guildId`
     )
 
-    await deleteStatement.bind([this.idForObject(guild)])
+    await deleteStatement.bind([idForObject(guild)])
     await deleteStatement.run()
 
     return deletedIds
@@ -196,8 +194,8 @@ class SQLiteDatabase extends BaseDatabase {
   ): Promise<RecordId> {
     const db = await this.dbConn
     let storeRes: ISqlite.RunResult<Statement> | undefined
-    const guildId = this.idForObject(guild)
-    const roleId = this.idForObject(role)
+    const guildId = idForObject(guild)
+    const roleId = idForObject(role)
 
     const fetchStatement = await db.prepare(
       `SELECT rowid FROM ${DBTable.GuildAdminRoles} WHERE guildId = @guildId`
@@ -230,7 +228,7 @@ class SQLiteDatabase extends BaseDatabase {
     guild: Guild | Snowflake
   ): Promise<RecordId | undefined> {
     const db = await this.dbConn
-    const guildId = this.idForObject(guild)
+    const guildId = idForObject(guild)
     const deleteStatement = await db.prepare(
       `DELETE FROM ${DBTable.GuildAdminRoles} WHERE guildId = @guildId`
     )
@@ -244,7 +242,7 @@ class SQLiteDatabase extends BaseDatabase {
     guild: Guild | Snowflake
   ): Promise<string | undefined> {
     const db = await this.dbConn
-    const guildId = this.idForObject(guild)
+    const guildId = idForObject(guild)
     const fetchStatement = await db.prepare(
       `SELECT roleId FROM ${DBTable.GuildAdminRoles} WHERE guildId = @guildId`
     )

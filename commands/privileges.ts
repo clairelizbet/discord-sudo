@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction } from 'discord.js'
 import { removeGuildUserRoles } from '../discord'
 import {
   ApplicationCommandOptionType,
@@ -6,6 +6,7 @@ import {
 } from 'discord-api-types/v9'
 import { BaseBotCommand } from './base'
 import { getDatabase } from '../database'
+import { idForObject } from '../util/object'
 
 class PrivilegesCommand extends BaseBotCommand {
   defaultUserPermissions: bigint
@@ -28,7 +29,7 @@ class PrivilegesCommand extends BaseBotCommand {
   }
 
   async handleDrop(
-    interaction: CommandInteraction
+    interaction: ChatInputCommandInteraction
   ): Promise<string | undefined> {
     const { guild } = interaction
     const activeCommandName = `${
@@ -43,11 +44,9 @@ class PrivilegesCommand extends BaseBotCommand {
       return
     }
 
-    const user = interaction.isUserContextMenu()
-      ? interaction.targetMember?.user
-      : interaction.member?.user
+    const userId = idForObject(interaction.member?.user)
 
-    if (!user) {
+    if (!userId) {
       interaction.reply({
         content: `:warning: Unable to grant admin access - no guild member target`,
         ephemeral: true,
@@ -56,17 +55,17 @@ class PrivilegesCommand extends BaseBotCommand {
     }
 
     try {
-      const userInfo = await guild.members.fetch(user.id)
+      const userInfo = await guild.members.fetch(userId)
       const userAdminRoles = userInfo.roles.cache.filter((userRole) =>
-        userRole.permissions.has('ADMINISTRATOR')
+        userRole.permissions.has(PermissionFlagsBits.Administrator)
       )
       await removeGuildUserRoles(
         guild,
-        user.id,
+        userId,
         userAdminRoles,
         'Privilege drop requested'
       )
-      await getDatabase().removeAuthorization(user.id, guild)
+      await getDatabase().removeAuthorization(userId, guild)
 
       interaction.reply({
         content: `:white_check_mark: Admin access privileges dropped`,
@@ -82,7 +81,9 @@ class PrivilegesCommand extends BaseBotCommand {
     }
   }
 
-  async handleInteraction(interaction: CommandInteraction): Promise<void> {
+  async handleInteraction(
+    interaction: ChatInputCommandInteraction
+  ): Promise<void> {
     try {
       if (interaction.options.getSubcommand() === 'drop') {
         await this.handleDrop(interaction)

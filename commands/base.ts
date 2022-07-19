@@ -5,9 +5,9 @@ import {
   Permissions,
 } from 'discord-api-types/v9'
 import {
-  Interaction,
   BaseApplicationCommandData,
   CommandInteraction,
+  BaseInteraction,
 } from 'discord.js'
 
 interface CommandData {
@@ -31,7 +31,7 @@ interface BotCommand extends BaseApplicationCommandData {
   defaultUserPermissions?: bigint
   acceptsDirectMessages?: boolean
 
-  handleInteraction(interaction: Interaction): Promise<void>
+  handleInteraction(interaction: BaseInteraction): Promise<void>
   getData(): CommandData
   toJSON(): string
 }
@@ -58,7 +58,7 @@ abstract class BaseBotCommand implements BotCommand {
     return
   }
 
-  abstract handleInteraction(interaction: Interaction): Promise<void>
+  abstract handleInteraction(interaction: BaseInteraction): Promise<void>
 
   getData(): CommandData {
     return {

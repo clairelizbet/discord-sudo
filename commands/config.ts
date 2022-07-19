@@ -1,4 +1,4 @@
-import { CommandInteraction } from 'discord.js'
+import { ChatInputCommandInteraction, CommandInteraction } from 'discord.js'
 import {
   ApplicationCommandOptionType,
   PermissionFlagsBits,
@@ -66,7 +66,7 @@ class ConfigCommand extends BaseBotCommand {
     try {
       const role = await guild.roles.fetch(roleId)
 
-      if (!role?.permissions.has('ADMINISTRATOR')) {
+      if (!role?.permissions.has(PermissionFlagsBits.Administrator)) {
         interaction.reply({
           content: `:no_entry_sign: Role must have admin privileges`,
           ephemeral: true,
@@ -126,7 +126,9 @@ class ConfigCommand extends BaseBotCommand {
     }
   }
 
-  async handleInteraction(interaction: CommandInteraction): Promise<void> {
+  async handleInteraction(
+    interaction: ChatInputCommandInteraction
+  ): Promise<void> {
     try {
       if (interaction.options.getSubcommand() === 'set-admin-role') {
         await this.handleSetRole(interaction)
