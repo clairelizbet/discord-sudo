@@ -37,7 +37,7 @@
     "discord-api-types": "^0.36.3",
     "discord.js": "^14.0.3",
     "sqlite": "^4.1.2",
-    "sqlite3": "^5.0.10"
+    "sqlite3": "^5.0.11"
   },
   "devDependencies": {
     "@tsconfig/node16": "^1.0.3",
