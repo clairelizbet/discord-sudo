@@ -1,6 +1,6 @@
 {
   "name": "discord-sudo",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "Discord bot for granting temporary role-based admin access",
   "scripts": {
     "build": "tsc",
