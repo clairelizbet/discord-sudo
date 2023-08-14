@@ -37,7 +37,7 @@
     "date-fns": "^2.29.3",
     "discord-api-types": "^0.37.46",
     "discord.js": "^14.7.1",
-    "sqlite": "^4.1.2",
+    "sqlite": "^5.0.1",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
