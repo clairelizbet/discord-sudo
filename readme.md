@@ -56,11 +56,7 @@ Alias: `/unsudo`
 
 ## ☁ Running a private instance
 
-> 🌐 There is a [public instance available](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands). This is the recommended way to add the bot.
-
-If you would rather self-host Sudo, you will first need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
-
-Then you can run Sudo for Discord either containerized with Docker or using Node directly.
+> 🌐 There is a [public instance available](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands) but if you would rather self-host Sudo, you will first need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
 
 **🛠 Setting up the environment**
 
@@ -87,7 +83,7 @@ docker run \
 
 ### 📦 Using Node
 
-To run using Node, your host machine will need **Node 16** installed.
+To run using Node, your host machine will need **Node 16** or later installed (Node 18+ recommended).
 
 ```sh
 # Installs third-party packages the bot depends on

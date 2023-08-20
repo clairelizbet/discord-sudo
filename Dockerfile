@@ -1,5 +1,5 @@
-FROM node:16-slim
-LABEL org.opencontainers.image.authors="claire <clairelizbet@hey.com>"
+FROM node:18-slim
+LABEL org.opencontainers.image.authors="claire <claire@clairecampbell.io>"
 
 # Copy source to /app and switch to node user
 RUN mkdir /app
