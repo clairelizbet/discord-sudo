@@ -11,6 +11,12 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
+      - run: sudo apt-get install -y zsh
+      - run: zsh
+
+      - run: export tagversion=${tag#v}
+      - run: export tagmajorversion=${${tag#v}%.*.*}
+
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -24,24 +30,26 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v2
         with:
-          username: ${{ vars.DOCKER_USER }}
+          username: ${{ vars.DOCKER_USER | secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - run: sudo apt-get install -y zsh
       - name: Publish Docker container
         run: |
-          zsh -c ' \
-            docker buildx build . \
-              -t clairelizbet/discord-sudo:latest \
-              -t "clairelizbet/discord-sudo:${tag#v}" \
-              -t "clairelizbet/discord-sudo:${${tag#v}%.*.*}" \
-              --push'
+          docker buildx build . \
+            -t clairelizbet/discord-sudo:latest \
+            -t "clairelizbet/discord-sudo:${tagversion}" \
+            -t "clairelizbet/discord-sudo:${tagmajorversion}" \
+            --push
+
+      - run: export releasenotes=$(< ${GITHUB_WORKSPACE}/.github/release.md)
+      - run: export releasenotes=${releasenotes:gs/'${tagversion}'/${tagversion}}
+      - run: export releasenotes=${releasenotes:gs/'${tagmajorversion}'/${tagmajorversion}}
 
       - name: Create release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "$tag" \
-            --repo "$GITHUB_REPOSITORY" \
-            --title "v${tag#v} Update 🔧" \
-            --notes-file "${GITHUB_WORKSPACE}/.github/release.md"
+          gh release create "${tag}" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "v${tagversion} Update 🔧" \
+            --notes "${releasenotes}"

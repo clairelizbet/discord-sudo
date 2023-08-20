@@ -11,7 +11,7 @@ import {
 } from 'discord.js'
 
 interface CommandData {
-  type: ApplicationCommandType
+  type: typeof ApplicationCommandType.ChatInput
   name: string
   name_localizations?: LocalizationMap | null
   name_localized?: string
@@ -25,7 +25,7 @@ interface CommandData {
 
 interface BotCommand extends BaseApplicationCommandData {
   name: string
-  type: ApplicationCommandType
+  type: typeof ApplicationCommandType.ChatInput
   options?: APIApplicationCommandOption[]
   description: string
   defaultUserPermissions?: bigint
@@ -38,7 +38,7 @@ interface BotCommand extends BaseApplicationCommandData {
 
 abstract class BaseBotCommand implements BotCommand {
   name: string
-  type: ApplicationCommandType
+  type: typeof ApplicationCommandType.ChatInput
   options?: APIApplicationCommandOption[]
   description: string
   defaultUserPermissions?: bigint
