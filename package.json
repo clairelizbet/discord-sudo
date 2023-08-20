@@ -4,6 +4,7 @@
   "description": "Discord bot for granting temporary role-based admin access",
   "scripts": {
     "build": "tsc",
+    "build:image": "docker buildx build . -t clairelizbet/discord-sudo",
     "build:dev": "tsc --incremental",
     "make-deps-update-list": "node dist/package-update-deps",
     "start": "node dist"
@@ -17,7 +18,7 @@
     "discord-bot",
     "sudo"
   ],
-  "author": "claire <clairelizbet@hey.com>",
+  "author": "",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/clairelizbet/discord-sudo/issues"
@@ -30,19 +31,19 @@
     "singleQuote": true
   },
   "engines": {
-    "node": "^16.15.1"
+    "node": ">=16.15.1"
   },
   "dependencies": {
     "@discordjs/rest": "^2.0.1",
-    "date-fns": "^2.29.3",
+    "date-fns": "^2.30.0",
     "discord-api-types": "^0.37.54",
-    "discord.js": "^14.7.1",
-    "sqlite": "^4.1.2",
+    "discord.js": "~14.7",
+    "sqlite": "^4.2.1",
     "sqlite3": "^5.1.6"
   },
   "devDependencies": {
-    "@tsconfig/node16": "^1.0.3",
+    "@tsconfig/node18": "^18.2.0",
     "dotenv": "^16.3.1",
-    "typescript": "^5.1.3"
+    "typescript": "^5.1.6"
   }
 }
