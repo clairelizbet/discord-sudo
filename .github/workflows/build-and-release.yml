@@ -4,11 +4,10 @@ on:
     tags:
       - 'v?[0-9].[0-9].[0-9]'
 
-env:
-  tag: ${{ github.ref_name }}
-
 jobs:
   build-and-release:
+    env:
+      tag: ${{ github.ref_name }}
     runs-on: ubuntu-latest
     steps:
       - run: export ghdir=${GITHUB_WORKSPACE}/.github
