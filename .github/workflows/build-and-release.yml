@@ -11,12 +11,9 @@ jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - run: sudo apt-get install -y zsh
-
+      - run: export ghdir=${GITHUB_WORKSPACE}/.github
       - run: export tagversion=${tag#v}
-        shell: zsh {0}
-      - run: export tagmajorversion=${${tag#v}%.*.*}
-        shell: zsh {0}
+      - run: export tagmajorversion=${tagversion%.*.*}
 
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -41,21 +38,22 @@ jobs:
             -t "clairelizbet/discord-sudo:${tagversion}" \
             -t "clairelizbet/discord-sudo:${tagmajorversion}" \
             --push
-        shell: zsh {0}
 
-      - run: export releasenotes=$(< ${GITHUB_WORKSPACE}/.github/release.md)
-        shell: zsh {0}
-      - run: export releasenotes=${releasenotes:gs/'${tagversion}'/${tagversion}}
-        shell: zsh {0}
-      - run: export releasenotes=${releasenotes:gs/'${tagmajorversion}'/${tagmajorversion}}
-        shell: zsh {0}
-
+      - run: touch "${ghdir}/release.md"
+      - run: mkdir -p dist
+      - run: touch "${ghdir}/dist/title.txt"
+      - run: cp "${ghdir}/release.md" "${ghdir}/dist/"
       - name: Create release
+        run: npm run build:release --if-present
+
+      - run: export defaultTitle="v${tagVersion} Update"
+      - run: export titleFromFile=$(< "${ghdir}/dist/title.txt")
+      - run: export releaseTitle=${titleFromFile:-${defaultTitle}}
+      - name: Publish release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "${tag}" \
             --repo "${GITHUB_REPOSITORY}" \
-            --title "v${tagversion} Update 🔧" \
-            --notes "${releasenotes}"
-        shell: zsh {0}
+            --title "${releaseTitle}" \
+            --notes-file "${ghdir}/dist/release.md"
