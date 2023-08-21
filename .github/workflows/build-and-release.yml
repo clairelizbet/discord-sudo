@@ -6,11 +6,10 @@ on:
 
 jobs:
   build-and-release:
-    env:
-      tag: ${{ github.ref_name }}
     runs-on: ubuntu-latest
     steps:
       - run: export ghdir=${GITHUB_WORKSPACE}/.github
+      - run: export tag="${{ github.ref_name }}"
       - run: export tagversion=${tag#v}
       - run: export tagmajorversion=${tagversion%.*.*}
 
