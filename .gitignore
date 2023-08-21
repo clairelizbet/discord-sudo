@@ -7,5 +7,5 @@ sudo*.db
 # Third-party dependencies
 node_modules/
 
-# Builds are stored here
+# Builds
 dist/

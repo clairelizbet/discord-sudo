@@ -1,8 +1,10 @@
+# v${tagVersion} Update 🔧
+
 ## New [Docker](https://hub.docker.com/r/clairelizbet/discord-sudo) tags
 
-`${tagversion}`
+`${tagVersion}`
 
 ## Updated [Docker](https://hub.docker.com/r/clairelizbet/discord-sudo) tags
 
 `latest`
-`${tagmajorversion}`
+`${tagMajorVersion}`
