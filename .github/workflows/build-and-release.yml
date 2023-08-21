@@ -12,10 +12,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: sudo apt-get install -y zsh
-      - run: zsh
 
       - run: export tagversion=${tag#v}
+        shell: zsh {0}
       - run: export tagmajorversion=${${tag#v}%.*.*}
+        shell: zsh {0}
 
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -40,10 +41,14 @@ jobs:
             -t "clairelizbet/discord-sudo:${tagversion}" \
             -t "clairelizbet/discord-sudo:${tagmajorversion}" \
             --push
+        shell: zsh {0}
 
       - run: export releasenotes=$(< ${GITHUB_WORKSPACE}/.github/release.md)
+        shell: zsh {0}
       - run: export releasenotes=${releasenotes:gs/'${tagversion}'/${tagversion}}
+        shell: zsh {0}
       - run: export releasenotes=${releasenotes:gs/'${tagmajorversion}'/${tagmajorversion}}
+        shell: zsh {0}
 
       - name: Create release
         env:
@@ -53,3 +58,4 @@ jobs:
             --repo "${GITHUB_REPOSITORY}" \
             --title "v${tagversion} Update 🔧" \
             --notes "${releasenotes}"
+        shell: zsh {0}
