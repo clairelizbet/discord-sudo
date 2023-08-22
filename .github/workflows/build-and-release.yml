@@ -28,13 +28,13 @@ jobs:
           username: ${{ vars.DOCKER_USER || secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      # - name: Publish Docker container
-      #   run: |
-      #     docker buildx build . \
-      #       -t clairelizbet/discord-sudo:latest \
-      #       -t "clairelizbet/discord-sudo:$tag" \
-      #       -t "clairelizbet/discord-sudo:${tag%.*.*}" \
-      #       --push
+      - name: Publish Docker container
+        run: |
+          docker buildx build . \
+            -t clairelizbet/discord-sudo:latest \
+            -t "clairelizbet/discord-sudo:$tag" \
+            -t "clairelizbet/discord-sudo:${tag%.*.*}" \
+            --push
 
       - name: Compile release template
         working-directory: .github
