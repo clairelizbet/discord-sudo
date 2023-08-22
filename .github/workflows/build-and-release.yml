@@ -1,18 +1,17 @@
 name: Build and publish release
+
 on:
   push:
     tags:
       - 'v?[0-9].[0-9].[0-9]'
 
+env:
+  tag: ${{ github.ref_name }}
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
     steps:
-      - run: export ghdir=${GITHUB_WORKSPACE}/.github
-      - run: export tag="${{ github.ref_name }}"
-      - run: export tagversion=${tag#v}
-      - run: export tagmajorversion=${tagversion%.*.*}
-
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
@@ -33,25 +32,27 @@ jobs:
         run: |
           docker buildx build . \
             -t clairelizbet/discord-sudo:latest \
-            -t "clairelizbet/discord-sudo:${tagversion}" \
-            -t "clairelizbet/discord-sudo:${tagmajorversion}" \
+            -t "clairelizbet/discord-sudo:$tag" \
+            -t "clairelizbet/discord-sudo:${tag%.*.*}" \
             --push
 
-      - run: touch "${ghdir}/release.md"
-      - run: mkdir -p dist
-      - run: touch "${ghdir}/dist/title.txt"
-      - run: cp "${ghdir}/release.md" "${ghdir}/dist/"
-      - name: Create release
-        run: npm run build:release --if-present
+      - name: Compile release template
+        working-directory: $GITHUB_WORKSPACE/.github
+        run: |
+          touch release.md
+          mkdir -p dist
+          touch dist/title.txt
+          cp release.md dist/
+          npm run build:release --if-present
 
-      - run: export defaultTitle="v${tagVersion} Update"
-      - run: export titleFromFile=$(< "${ghdir}/dist/title.txt")
+      - run: export defaultTitle="v${tag#v} Update"
+      - run: export titleFromFile=$(< "$GITHUB_WORKSPACE/.github/dist/title.txt")
       - run: export releaseTitle=${titleFromFile:-${defaultTitle}}
       - name: Publish release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh release create "${tag}" \
-            --repo "${GITHUB_REPOSITORY}" \
+          gh release create "$tag" \
+            --repo "$GITHUB_REPOSITORY" \
             --title "${releaseTitle}" \
-            --notes-file "${ghdir}/dist/release.md"
+            --notes-file "$GITHUB_WORKSPACE/.github/dist/release.md"
