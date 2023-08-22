@@ -28,31 +28,29 @@ jobs:
           username: ${{ vars.DOCKER_USER || secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Publish Docker container
-        run: |
-          docker buildx build . \
-            -t clairelizbet/discord-sudo:latest \
-            -t "clairelizbet/discord-sudo:$tag" \
-            -t "clairelizbet/discord-sudo:${tag%.*.*}" \
-            --push
+      # - name: Publish Docker container
+      #   run: |
+      #     docker buildx build . \
+      #       -t clairelizbet/discord-sudo:latest \
+      #       -t "clairelizbet/discord-sudo:$tag" \
+      #       -t "clairelizbet/discord-sudo:${tag%.*.*}" \
+      #       --push
 
       - name: Compile release template
-        working-directory: $GITHUB_WORKSPACE/.github
+        working-directory: .github
         run: |
           touch release.md
           mkdir -p dist
           touch dist/title.txt
+          echo $tag > dist/title.txt
           cp release.md dist/
           npm run build:release --if-present
 
-      - run: export defaultTitle="v${tag#v} Update"
-      - run: export titleFromFile=$(< "$GITHUB_WORKSPACE/.github/dist/title.txt")
-      - run: export releaseTitle=${titleFromFile:-${defaultTitle}}
       - name: Publish release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release create "$tag" \
             --repo "$GITHUB_REPOSITORY" \
-            --title "${releaseTitle}" \
+            --title "$(< "$GITHUB_WORKSPACE/.github/dist/title.txt")" \
             --notes-file "$GITHUB_WORKSPACE/.github/dist/release.md"
