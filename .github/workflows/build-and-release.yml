@@ -14,6 +14,8 @@ jobs:
     steps:
       - uses: clairelizbet/action-build@v1
       - uses: clairelizbet/action-release@v1
+        with:
+          token: test
 
       - name: Login to Docker Hub
         uses: docker/login-action@v2
