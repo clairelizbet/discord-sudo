@@ -56,7 +56,9 @@ Alias: `/unsudo`
 
 ## ☁ Running a private instance
 
-> 🌐 There is a [public instance available](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands) but if you would rather self-host Sudo, you will first need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
+🌐 There is a [public instance available](https://discord.com/oauth2/authorize?client_id=984508139472838656&permissions=268435456&scope=bot%20applications.commands) but you can self-host Sudo if you'd like.
+
+> You will first need to create an app in the [Discord Developer Portal](https://discord.com/developers/applications).
 
 **🛠 Setting up the environment**
 
