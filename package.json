@@ -38,7 +38,7 @@
     "@discordjs/rest": "^2.1.0",
     "date-fns": "^2.30.0",
     "discord-api-types": "^0.37.63",
-    "discord.js": "~14.13",
+    "discord.js": "~14.14",
     "sqlite": "^5.1.1",
     "sqlite3": "^5.1.6"
   },
