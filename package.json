@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.1.0",
-    "date-fns": "^2.30.0",
+    "date-fns": "^3.3.1",
     "discord-api-types": "^0.37.63",
     "discord.js": "~14.14",
     "sqlite": "^5.1.1",
