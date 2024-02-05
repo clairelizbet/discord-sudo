@@ -1,6 +1,7 @@
 {
   "name": "discord-sudo",
-  "version": "1.7.0",
+  "version": "1.7.1",
+  "private": true,
   "description": "Discord bot for granting temporary role-based admin access",
   "scripts": {
     "build": "tsc",
@@ -19,7 +20,7 @@
     "discord-bot",
     "sudo"
   ],
-  "author": "",
+  "author": "claire (https://github.com/clairelizbet)",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/clairelizbet/discord-sudo/issues"
@@ -35,16 +36,16 @@
     "node": ">=16.15.1"
   },
   "dependencies": {
-    "@discordjs/rest": "^2.1.0",
+    "@discordjs/rest": "^2.2.0",
     "date-fns": "^2.30.0",
-    "discord-api-types": "^0.37.63",
-    "discord.js": "~14.14",
+    "discord-api-types": "^0.37.68",
+    "discord.js": "14.14",
     "sqlite": "^5.1.1",
-    "sqlite3": "^5.1.6"
+    "sqlite3": "^5.1.7"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.2",
-    "dotenv": "^16.3.1",
-    "typescript": "^5.1.6"
+    "dotenv": "^16.4.1",
+    "typescript": "^5.3.3"
   }
 }
