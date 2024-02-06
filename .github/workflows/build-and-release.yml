@@ -1,4 +1,4 @@
-name: Build and create draft release
+name: Build and push Docker release
 
 on:
   push:
